@@ -1,9 +1,6 @@
 use <ring.scad>;
 
-
-
 gearD = 28;
-color([1,0,0]) translate([0,0,30]) cylinder(d=gearD, h=2);
 
 
 
@@ -50,23 +47,53 @@ module clockHand() {
 }
 
 
-
+//difference() {
+//  translate([-3.5,0,0]) rotate([0,90,0]) ring(78,76,7, 100);
+//  translate([-5,-50,-100]) cube([10,100,100]);
+//}
 
 
 //MOTOR AND MOUNTING PLATE
 motorAssembly();
+color([1,0,0,0.2]) translate([0,0,30]) cylinder(d=gearD, h=2);
 
 module motorAssembly() {
-  union() {
-    for (i=[0:3]) {
-      rotate(i*90) translate([15,-3.5,0]) cube([20,7,2]);
+  ringWidth = 7;
+  outterRingD = 72;
+  innerRingD = 26;
+  bracketHeight = 2;
+  ringFn = 100;
+  crosshairTranslate = (innerRingD/2);
+  crosshairL = outterRingD/2 - innerRingD/2;
+  difference() {
+    union() {
+      for (i=[0:2]) {
+        rotate(i*180+90) translate([crosshairTranslate,-ringWidth/2,0]) cube([crosshairL,ringWidth,2]);
+      }
+      difference() {
+        $fn = 40;
+        holderH = 14;
+        union() {
+          translate([-outterRingD/2,-ringWidth/2,0]) cube([outterRingD,ringWidth,2]);
+          cylinder(d=10.5, h=holderH);
+        }
+        translate([0,0,-1]) cylinder(d=8.5, h=holderH+2);
+      }
+      
+      ring(outterRingD+ringWidth, outterRingD-ringWidth, bracketHeight, ringFn);
+      ring(innerRingD+ringWidth, innerRingD-ringWidth, bracketHeight, ringFn);
+      
+      rotationAmount = 25;
+      translate([-20,5,0]) rotate(rotationAmount) motorWithMounts();
+      translate([20,-5,0]) rotate(180+rotationAmount) motorWithMounts();
     }
-    ring(79,65,2, 100);
-    ring(33,20,2, 100);
-    rotationAmount = 25;
-    translate([-20,5,0]) rotate(rotationAmount) motorWithMounts();
-    translate([20,-5,0]) rotate(180+rotationAmount) motorWithMounts();
-  }
+    for (i=[0:3]) {
+      rotate((i*90)+45) translate([0,outterRingD/2,-1]) cylinder(d=3, h=4, $fn=20);
+      if (i%2 == 1) {
+        rotate((i*90)) translate([0,innerRingD/2,-1]) cylinder(d=3, h=4, $fn=20);
+      }
+    }
+  } 
 }
 module motorWithMounts() {
   mountArms();
@@ -85,5 +112,5 @@ module motorMountArm() {
 }
 module motor() {
   color([1,1,1,0.2]) import("motor.stl");
-  color([0.5,1,1,0.5]) translate([0,8,20]) cylinder(d=gearD, h=2);
+  color([0.5,1,1,0.2]) translate([0,8,20]) cylinder(d=gearD, h=2);
 }
