@@ -39,7 +39,7 @@ innerClockHand();
 //mounting plate
 motorAssembly();
 //gear
-color([0,1,0,0.2]) translate([0,0,30]) motorGear();
+color([0,0.5,0]) translate([0,0,30]) motorGear();
 
 //     ____ _            _      _   _                 _
 //    / ___| | ___   ___| | __ | | | | __ _ _ __   __| |___ 
@@ -148,7 +148,8 @@ module motorGear() {
     gear_thickness = 2,
     rim_thickness = 2,
     hub_thickness = 4,
-    hub_diameter = 8);
+    hub_diameter = 8,
+    bore_diameter = 6);
 }
 module motor() {
   color([1,1,1,0.2]) import("motor.stl");
