@@ -1,8 +1,9 @@
 use <ring.scad>;
+use <parametric_involute_gear_v5.0.scad>; //from https://www.thingiverse.com/thing:3575
 
 //Globals
 //Show the motors or not, really used for final render.
-renderMotors = false;
+renderMotors = true;
 //all screw holes will fit this size.
 screwHoles = 3.08; //M3
 //Generic default resolution for circles.
@@ -38,7 +39,7 @@ innerClockHand();
 //mounting plate
 motorAssembly();
 //gear
-color([1,0,0,0.2]) translate([0,0,30]) cylinder(d=gearD, h=2);
+color([0,1,0,0.2]) translate([0,0,30]) motorGear();
 
 //     ____ _            _      _   _                 _
 //    / ___| | ___   ___| | __ | | | | __ _ _ __   __| |___ 
@@ -141,7 +142,15 @@ module motorMountArm() {
     translate([0,0,4]) cylinder(h=22, d=screwHoles);
   }
 }
+module motorGear() {
+  gear (circular_pitch=195,
+    number_of_teeth = 24,
+    gear_thickness = 2,
+    rim_thickness = 2,
+    hub_thickness = 4,
+    hub_diameter = 8);
+}
 module motor() {
   color([1,1,1,0.2]) import("motor.stl");
-  color([0.5,1,1,0.2]) translate([0,8,20]) cylinder(d=gearD, h=2);
+  color([0.5,1,1,0.2]) translate([0,8,20]) motorGear();
 }
