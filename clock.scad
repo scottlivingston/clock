@@ -3,13 +3,10 @@ use <ring.scad>;
 //Globals
 //Show the motors or not, really used for final render.
 renderMotors = false;
-
 //all screw holes will fit this size.
 screwHoles = 3.08; //M3
-
 //Generic default resolution for circles.
 $fa = 1;
-
 //Used for hole precision, needed to be high to allow for smooth spinning of the hands.
 smallFn = 64;
 
