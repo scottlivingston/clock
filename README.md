@@ -5,11 +5,11 @@ This is still very much a work in progress but as I progress more parts will sho
 
 ## Progress
 ### CAD
-- [x] Motor mounting bracket
-- [x] Inner clock hand
-- [x] Outer clock hand
+- [x] ~Motor mounting bracket~
+- [x] ~Inner clock hand~
+- [x] ~Outer clock hand~
 - [ ] LED mounting bracket
-- [x] Organize `.scad` file for general consumption and small tweaks
+- [x] ~Organize `.scad` file for general consumption and small tweaks~
 - [ ] Generate `.stl` files for all independant parts for printing
 
 ### Controller
