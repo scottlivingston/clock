@@ -26,7 +26,7 @@ pi=3.1415926535897932384626433832795;
 
 //==================================================
 // Bevel Gears:
-// Two gears with the same cone distance, circular pitch (measured at the cone distance) 
+// Two gears with the same cone distance, circular pitch (measured at the cone distance)
 // and pressure angle will mesh.
 
 module bevel_gear_pair (
@@ -37,7 +37,7 @@ module bevel_gear_pair (
 {
 	outside_pitch_radius1 = gear1_teeth * outside_circular_pitch / 360;
 	outside_pitch_radius2 = gear2_teeth * outside_circular_pitch / 360;
-	pitch_apex1=outside_pitch_radius2 * sin (axis_angle) + 
+	pitch_apex1=outside_pitch_radius2 * sin (axis_angle) +
 		(outside_pitch_radius2 * cos (axis_angle) + outside_pitch_radius1) / tan (axis_angle);
 	cone_distance = sqrt (pow (pitch_apex1, 2) + pow (outside_pitch_radius1, 2));
 	pitch_apex2 = sqrt (pow (cone_distance, 2) - pow (outside_pitch_radius2, 2));
@@ -56,7 +56,7 @@ module bevel_gear_pair (
 			cone_distance=cone_distance,
 			pressure_angle=30,
 			outside_circular_pitch=outside_circular_pitch);
-	
+
 		rotate([0,-(pitch_angle1+pitch_angle2),0])
 		translate([0,0,-pitch_apex2])
 		bevel_gear (
@@ -113,7 +113,7 @@ module bevel_gear (
 	// Calculate and display the pitch angle. This is needed to determine the angle to mount two meshing cone gears.
 
 	// Base Circle for forming the involute teeth shape.
-	base_radius = back_cone_radius * cos (pressure_angle);	
+	base_radius = back_cone_radius * cos (pressure_angle);
 
 	// Diametrial pitch: Number of teeth per unit length.
 	pitch_diametrial = number_of_teeth / outside_pitch_diameter;
@@ -131,9 +131,9 @@ module bevel_gear (
 	root_cone_full_radius = tan (root_angle)*apex_to_apex;
 	back_cone_full_radius=apex_to_apex / tan (pitch_angle);
 
-	back_cone_end_radius = 
-		outside_pitch_radius - 
-		dedendum * cos (pitch_angle) - 
+	back_cone_end_radius =
+		outside_pitch_radius -
+		dedendum * cos (pitch_angle) -
 		gear_thickness / tan (pitch_angle);
 	back_cone_descent = dedendum * sin (pitch_angle) + gear_thickness;
 
@@ -146,9 +146,9 @@ module bevel_gear (
 	face_cone_height = apex_to_apex-face_width / cos (pitch_angle);
 	face_cone_full_radius = face_cone_height / tan (pitch_angle);
 	face_cone_descent = dedendum * sin (pitch_angle);
-	face_cone_end_radius = 
+	face_cone_end_radius =
 		outside_pitch_radius -
-		face_width / sin (pitch_angle) - 
+		face_width / sin (pitch_angle) -
 		face_cone_descent / tan (pitch_angle);
 
 	// For the bevel_gear_flat finish option, calculate the height of a cube to select the portion of the gear that includes the full pitch face.
@@ -186,7 +186,7 @@ module bevel_gear (
 			{
 				translate ([0,0,-back_cone_descent])
 				cylinder (
-					$fn=number_of_teeth*2, 
+					$fn=number_of_teeth*2,
 					r1=back_cone_end_radius,
 					r2=back_cone_full_radius*2,
 					h=apex_to_apex + back_cone_descent);
@@ -199,7 +199,7 @@ module bevel_gear (
 					bevel_gear_flat_height]);
 			}
 		}
-		
+
 		if (finish == bevel_gear_back_cone)
 		{
 			translate ([0,0,-face_cone_descent])
@@ -211,7 +211,7 @@ module bevel_gear (
 
 		translate ([0,0,pitch_apex - apex_to_apex])
 		cylinder (r=bore_diameter/2,h=apex_to_apex);
-	}	
+	}
 }
 
 module involute_bevel_gear_tooth (
@@ -235,9 +235,9 @@ module involute_bevel_gear_tooth (
 
 	min_radius = max (base_radius*2,root_radius*2);
 
-	pitch_point = 
+	pitch_point =
 		involute (
-			base_radius*2, 
+			base_radius*2,
 			involute_intersect_angle (base_radius*2, back_cone_radius*2));
 	pitch_angle = atan2 (pitch_point[1], pitch_point[0]);
 	centre_angle = pitch_angle + half_thick_angle;
@@ -254,29 +254,23 @@ module involute_bevel_gear_tooth (
 	{
 		for (i=[1:res])
 		{
-			assign (
-				point1=
-					involute (base_radius*2,start_angle+(stop_angle - start_angle)*(i-1)/res),
-				point2=
-					involute (base_radius*2,start_angle+(stop_angle - start_angle)*(i)/res))
-			{
-				assign (
-					side1_point1 = rotate_point (centre_angle, point1),
-					side1_point2 = rotate_point (centre_angle, point2),
-					side2_point1 = mirror_point (rotate_point (centre_angle, point1)),
-					side2_point2 = mirror_point (rotate_point (centre_angle, point2)))
-				{
-					polyhedron (
-						points=[
-							[back_cone_radius*2+0.1,0,cone_distance*2],
-							[side1_point1[0],side1_point1[1],0],
-							[side1_point2[0],side1_point2[1],0],
-							[side2_point2[0],side2_point2[1],0],
-							[side2_point1[0],side2_point1[1],0],
-							[0.1,0,0]],
-						triangles=[[0,1,2],[0,2,3],[0,3,4],[0,5,1],[1,5,2],[2,5,3],[3,5,4],[0,4,5]]);
-				}
-			}
+			point1 = involute (base_radius*2,start_angle+(stop_angle - start_angle)*(i-1)/res);
+			point2 = involute (base_radius*2,start_angle+(stop_angle - start_angle)*(i)/res);
+
+			side1_point1 = rotate_point (centre_angle, point1);
+			side1_point2 = rotate_point (centre_angle, point2);
+			side2_point1 = mirror_point (rotate_point (centre_angle, point1));
+			side2_point2 = mirror_point (rotate_point (centre_angle, point2));
+
+			polyhedron (
+				points=[
+					[back_cone_radius*2+0.1,0,cone_distance*2],
+					[side1_point1[0],side1_point1[1],0],
+					[side1_point2[0],side1_point2[1],0],
+					[side2_point2[0],side2_point2[1],0],
+					[side2_point1[0],side2_point1[1],0],
+					[0.1,0,0]],
+				triangles=[[0,1,2],[0,2,3],[0,3,4],[0,5,1],[1,5,2],[2,5,3],[3,5,4],[0,4,5]]);
 		}
 	}
 }
@@ -297,7 +291,7 @@ module gear (
 	twist=0,
 	involute_facets=0)
 {
-	if (circular_pitch==false && diametral_pitch==false) 
+	if (circular_pitch==false && diametral_pitch==false)
 		echo("MCAD ERROR: gear module needs either a diametral_pitch or circular_pitch");
 
 	//Convert diametrial pitch to our native circular pitch
@@ -373,7 +367,7 @@ module gear (
 			h=2+max(rim_thickness,hub_thickness,gear_thickness));
 		if (circles>0)
 		{
-			for(i=[0:circles-1])	
+			for(i=[0:circles-1])
 				rotate([0,0,i*360/circles])
 				translate([circle_orbit_diameter/2,0,-1])
 				cylinder(r=circle_diameter/2,h=max(gear_thickness,rim_thickness)+3);
@@ -431,21 +425,17 @@ module involute_gear_tooth (
 
 	union ()
 	{
-		for (i=[1:res])
-		assign (
-			point1=involute (base_radius,start_angle+(stop_angle - start_angle)*(i-1)/res),
-			point2=involute (base_radius,start_angle+(stop_angle - start_angle)*i/res))
-		{
-			assign (
-				side1_point1=rotate_point (centre_angle, point1),
-				side1_point2=rotate_point (centre_angle, point2),
-				side2_point1=mirror_point (rotate_point (centre_angle, point1)),
-				side2_point2=mirror_point (rotate_point (centre_angle, point2)))
-			{
-				polygon (
-					points=[[0,0],side1_point1,side1_point2,side2_point2,side2_point1],
-					paths=[[0,1,2,3,4,0]]);
-			}
+		for (i=[1:res]) {
+			point1 = involute (base_radius,start_angle+(stop_angle - start_angle)*(i-1)/res);
+			point2 = involute (base_radius,start_angle+(stop_angle - start_angle)*i/res);
+
+			side1_point1 = rotate_point (centre_angle, point1);
+			side1_point2 = rotate_point (centre_angle, point2);
+			side2_point1 = mirror_point (rotate_point (centre_angle, point1));
+			side2_point2 = mirror_point (rotate_point (centre_angle, point2));
+			polygon (
+				points=[[0,0],side1_point1,side1_point2,side2_point2,side2_point1],
+				paths=[[0,1,2,3,4,0]]);
 		}
 	}
 }
@@ -460,15 +450,15 @@ function involute_intersect_angle (base_radius, radius) = sqrt (pow (radius/base
 
 // Calculate the involute position for a given base radius and involute angle.
 
-function rotated_involute (rotate, base_radius, involute_angle) = 
+function rotated_involute (rotate, base_radius, involute_angle) =
 [
 	cos (rotate) * involute (base_radius, involute_angle)[0] + sin (rotate) * involute (base_radius, involute_angle)[1],
 	cos (rotate) * involute (base_radius, involute_angle)[1] - sin (rotate) * involute (base_radius, involute_angle)[0]
 ];
 
-function mirror_point (coord) = 
+function mirror_point (coord) =
 [
-	coord[0], 
+	coord[0],
 	-coord[1]
 ];
 
@@ -478,7 +468,7 @@ function rotate_point (rotate, coord) =
 	cos (rotate) * coord[1] - sin (rotate) * coord[0]
 ];
 
-function involute (base_radius, involute_angle) = 
+function involute (base_radius, involute_angle) =
 [
 	base_radius*(cos (involute_angle) + involute_angle*pi/180*sin (involute_angle)),
 	base_radius*(sin (involute_angle) - involute_angle*pi/180*cos (involute_angle)),
@@ -495,7 +485,7 @@ module test_gears()
 		gear (number_of_teeth=17,
 			circular_pitch=500,
 			circles=8);
-	
+
 		rotate ([0,0,360*4/17])
 		translate ([39.088888,0,0])
 		{
@@ -559,7 +549,7 @@ module test_gears()
 					circles=0);
 			}
 		}
-	
+
 		rotate ([0,0,360*-5/17])
 		translate ([44.444444444,0,0])
 		gear (number_of_teeth=15,
@@ -570,7 +560,7 @@ module test_gears()
 			gear_thickness=4,
 			hub_thickness=6,
 			circles=9);
-	
+
 		rotate ([0,0,360*-1/17])
 		translate ([30.5555555,0,-1])
 		gear (number_of_teeth=5,
@@ -584,7 +574,7 @@ module test_gears()
 module meshing_double_helix ()
 {
 	test_double_helix_gear ();
-	
+
 	mirror ([0,1,0])
 	translate ([58.33333333,0,0])
 	test_double_helix_gear (teeth=13,circles=6);
@@ -648,7 +638,7 @@ module test_backlash ()
 			bore_diameter=5,
 			backlash = 2,
 			circles=8);
-		
+
 		rotate ([0,0,360/teeth/4])
 		gear (
 			number_of_teeth = teeth,

@@ -1,6 +1,24 @@
 use <ring.scad>;
 use <parametric_involute_gear_v5.0.scad>; //from https://www.thingiverse.com/thing:3575
 
+// assembly will render the whole assembly positioned together. This makes it easy
+// to change things about the device and see the changes to the whole system
+assembly();
+
+//each individual part can be rendered at the center of the screen using their 
+//individule modules
+//outerClockHand();
+//innerClockHand();
+//motorAssembly();
+//driveGear("motor"); //need 2 of these
+//driveGear("inner");
+//driveGear("outer");
+//outerClockHandLockWasher();
+
+//debugging
+//hollowSquare(8,8,5);
+//lockCylinder(8,7,7,5);
+
 //Globals
 //Show the motors or not, really used for final render.
 renderMotors = true;
@@ -13,8 +31,10 @@ smallFn = 64;
 
 //Hands
 handWidth = 8;
+innerHandWidth = handWidth - 2.5;
 handLength = 38;
 handThickness = 2;
+innerHandZOffset = 3;
 blockSize = 30;
 gearD = 28;
 
@@ -31,15 +51,20 @@ outerX = (-x/2)+motorXOffset + x;
 outerY = (-y/2)-motorYOffset + y;
 outerRingRadius = sqrt(pow(outerX,2) + pow(outerY,2));
 innerRingRadius = sqrt(pow(innerX,2) + pow(innerY,2));
+//Gear
+hub_thickness = 3;
 
-
-//clock hands
-outerClockHand();
-innerClockHand();
-//mounting plate
-motorAssembly();
-//gear
-color([0,0.5,0]) translate([0,0,30]) motorGear();
+module assembly() {
+  //clock hands
+  translate([0,0,-blockSize]) rotate(180) outerClockHand();
+  translate([0,0,-blockSize-innerHandZOffset]) innerClockHand();
+  translate([0,0,14.2]) outerClockHandLockWasher();
+  //mounting plate
+  motorAssembly();
+  //gear
+  color([0,0.5,0,0.2]) translate([0,0,blockSize-hub_thickness]) driveGear("outer");
+  color([0.5,0.5,0.5,0.5]) translate([0,0,blockSize+hub_thickness]) rotate([0,180,0]) driveGear("inner");
+}
 
 //     ____ _            _      _   _                 _
 //    / ___| | ___   ___| | __ | | | | __ _ _ __   __| |___ 
@@ -50,22 +75,44 @@ color([0,0.5,0]) translate([0,0,30]) motorGear();
 module outerClockHand() {
   $fn = smallFn;
   union() {
-    ring(handWidth, handWidth-2, blockSize);
-    translate([0,0,-blockSize]) ring(handWidth, handWidth-2, blockSize);
-    translate([0,0,-blockSize]) rotate(180) clockHand();
+    //upper shaft
+    difference() {
+      difference() {
+        b = handWidth-1;
+        h = blockSize*2-hub_thickness;
+        translate([0,0,blockSize]) ring(handWidth, handWidth-2, blockSize);
+        translate([0,0,h]) hollowSquare(b,b,hub_thickness+1);
+      }
+      translate([0.75,0,44.2]) hollowSquare(handWidth,innerHandWidth+1,1);
+    }
+
+    //lower shaft
+    ring(handWidth, handWidth-2, blockSize);    
+    clockHand();
+  }
+}
+module outerClockHandLockWasher() {
+  difference() {
+    w = innerHandWidth+1;
+    c = innerHandWidth-0.5;
+    hollowSquare(w,w,1,2);
+    translate([-(c+0.25),-c/2,-1]) cube(c);
   }
 }
 module innerClockHand() {
   $fn = smallFn;
   union() {
-    innerHandWidth = handWidth - 2.5;
-    ring(innerHandWidth, innerHandWidth-2, 34);
-    translate([0,0,-blockSize-3])
-      cylinder(h=blockSize+3, d=innerHandWidth);
-    translate([0,0,-blockSize-1])
-      cylinder(h=1, d=handWidth);
-    translate([0,0,-blockSize-3])
-      clockHand();
+    //upper shaft
+    difference() {
+      translate([0,0,blockSize+innerHandZOffset]) ring(innerHandWidth, innerHandWidth-2, 33);
+      lockW = innerHandWidth-1;
+      translate([0,0,blockSize*2+innerHandZOffset]) hollowSquare(lockW,lockW,hub_thickness+1);
+    }
+    //lower shaft
+    cylinder(h=blockSize+innerHandZOffset, d=innerHandWidth);
+    //spacing ring
+    translate([0,0,2]) cylinder(h=innerHandZOffset-handThickness-0.3, d=handWidth);
+    clockHand();
   }
 }
 module clockHand() {
@@ -111,7 +158,7 @@ module motorAssembly() {
       ring(innerRingD+ringWidth, innerRingD-ringWidth, bracketHeight);
       
       //motor mounts.
-      translate([-motorXOffset,motorYOffset,0]) rotate(rotationAmount) motorWithMounts();
+      translate([-motorXOffset,motorYOffset,0]) rotate(rotationAmount) motorWithMounts("left");
       translate([motorXOffset,-motorYOffset,0]) rotate(180+rotationAmount) motorWithMounts();
     }
     
@@ -127,9 +174,9 @@ module motorAssembly() {
     }
   } 
 }
-module motorWithMounts() {
+module motorWithMounts(side) {
   mountArms();
-  if (renderMotors) translate([0,0,4]) motor();
+  if (renderMotors) translate([0,0,4]) motor(side);
 }
 module mountArms() {
   translate([motorMountSpacing/2, 0,0]) motorMountArm();
@@ -142,16 +189,68 @@ module motorMountArm() {
     translate([0,0,4]) cylinder(h=22, d=screwHoles);
   }
 }
-module motorGear() {
-  gear (circular_pitch=195,
-    number_of_teeth = 24,
-    gear_thickness = 2,
-    rim_thickness = 2,
-    hub_thickness = 4,
-    hub_diameter = 8,
-    bore_diameter = 6);
+module hollowSquare(x, y, h, o=max(x,y)) {
+  difference(){
+    ox = o+x;
+    oy = o+y;
+    translate([-ox/2,-oy/2,0]) cube([ox, oy, h]);
+    translate([-x/2,-y/2,-1]) cube([x, y, h+2]);
+  }
 }
-module motor() {
-  color([1,1,1,0.2]) import("motor.stl");
-  color([0.5,1,1,0.2]) translate([0,8,20]) motorGear();
+module lockCylinder(d, x, y, h) {
+  difference() {
+    cylinder(d=d, h=h, $fn = smallFn);
+    translate([0,0,-1]) hollowSquare(x, y, h+2, max(x,y));
+  }
+}
+module driveGear(mount) {
+  circular_pitch=195;
+  number_of_teeth = 24;
+  thickness = 2;
+  if (mount == "inner") {
+    difference() {
+      gear (circular_pitch = circular_pitch,
+        number_of_teeth = number_of_teeth,
+        gear_thickness = thickness,
+        rim_thickness = thickness,
+        hub_thickness = hub_thickness,
+        hub_diameter = 10,
+        bore_diameter = 0);
+      lockW = innerHandWidth-1;
+      translate([0,0,-1]) lockCylinder(innerHandWidth, lockW, lockW, hub_thickness+2);
+    }
+  } else if (mount == "outer") {
+    difference() {
+      gear (circular_pitch = circular_pitch,
+        number_of_teeth = number_of_teeth,
+        gear_thickness = thickness,
+        rim_thickness = thickness,
+        hub_thickness = hub_thickness,
+        hub_diameter = 10,
+        bore_diameter = 0);
+      lockW = handWidth-1;
+      translate([0,0,-1]) lockCylinder(handWidth, lockW, lockW, hub_thickness+2);
+    }
+  } else if (mount == "motor"){
+    difference() {
+      ht = 6;
+      gear (circular_pitch = circular_pitch,
+        number_of_teeth = number_of_teeth,
+        gear_thickness = thickness,
+        rim_thickness = thickness,
+        hub_thickness = ht,
+        hub_diameter = 7,
+        bore_diameter = 0);
+      translate([0,0,-1]) lockCylinder(5, 5, 3, ht+2);
+    }
+
+  }
+}
+module motor(side) {
+  if (side == "left") {
+    color([0.5,1,1,0.2]) translate([0,8,29]) rotate([0,180,0]) driveGear("motor");
+  } else {
+    color([0.5,1,1,0.2]) translate([0,8,23]) driveGear("motor");
+  }
+  color([1,1,1,0.5]) import("motor.stl");
 }
