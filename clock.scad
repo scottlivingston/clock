@@ -51,6 +51,10 @@ outerX = (-x/2)+motorXOffset + x;
 outerY = (-y/2)-motorYOffset + y;
 outerRingRadius = sqrt(pow(outerX,2) + pow(outerY,2));
 innerRingRadius = sqrt(pow(innerX,2) + pow(innerY,2));
+outerRingD = outerRingRadius * 2;
+innerRingD = innerRingRadius * 2;
+ringWidth = 7;
+bracketHeight = 2;
 //Gear
 hub_thickness = 3;
 
@@ -61,6 +65,7 @@ module assembly() {
   translate([0,0,14.2]) outerClockHandLockWasher();
   //mounting plate
   motorAssembly();
+  //ledMount();
   //gear
   color([0,0.5,0,0.2]) translate([0,0,blockSize-hub_thickness]) driveGear("outer");
   color([0.5,0.5,0.5,0.5]) translate([0,0,blockSize+hub_thickness]) rotate([0,180,0]) driveGear("inner");
@@ -87,8 +92,12 @@ module outerClockHand() {
     }
 
     //lower shaft
-    ring(handWidth, handWidth-2, blockSize);    
-    clockHand();
+    ring(handWidth, handWidth-2, blockSize);
+    difference() {
+      clockHand();
+      translate([0,0,-1]) cylinder(d=handWidth-2, h=handThickness+2);
+    }
+    
   }
 }
 module outerClockHandLockWasher() {
@@ -129,10 +138,6 @@ module clockHand() {
 //   |_|  |_|\___/ \__,_|_| |_|\__|_|_| |_|\__, | |_|   |_|\__,_|\__\___|
 //
 module motorAssembly() {
-  ringWidth = 7;
-  outerRingD = outerRingRadius * 2;
-  innerRingD = innerRingRadius * 2;
-  bracketHeight = 2;
   crosshairTranslate = (innerRingD/2);
   crosshairL = outerRingD/2 - innerRingD/2;
   difference() {
@@ -156,7 +161,7 @@ module motorAssembly() {
       ring(outerRingD+ringWidth, outerRingD-ringWidth, bracketHeight);
       //inner ring
       ring(innerRingD+ringWidth, innerRingD-ringWidth, bracketHeight);
-      
+
       //motor mounts.
       translate([-motorXOffset,motorYOffset,0]) rotate(rotationAmount) motorWithMounts("left");
       translate([motorXOffset,-motorYOffset,0]) rotate(180+rotationAmount) motorWithMounts();
@@ -173,6 +178,16 @@ module motorAssembly() {
       }
     }
   } 
+}
+
+module ledMount() {
+  translate([-3,-(outerRingD-innerRingD+ringWidth),0]) 
+    rotate([90,0,90]) 
+      rotate_extrude(angle=43, convexity = 2)
+        translate([outerRingRadius, 0, 0])
+          square([1,6]);
+  translate([-3,0,0]) rotate([0,90,0]) ring(outerRingD+1,outerRingD-1,6);
+  //translate([-3,-(outerRingD-innerRingD+ringWidth),0]) rotate([0,90,0]) ring(outerRingD+1,outerRingD-1,6);
 }
 module motorWithMounts(side) {
   mountArms();
