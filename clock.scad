@@ -238,7 +238,7 @@ module driveGear(mount) {
         gear_thickness = thickness,
         rim_thickness = thickness,
         hub_thickness = hub_thickness,
-        hub_diameter = 10,
+        hub_diameter = 12,
         bore_diameter = 0);
       lockW = compensatedHandWidth-1;
       translate([0,0,-1]) lockCylinder(compensatedHandWidth, lockW, lockW, hub_thickness+2);
@@ -251,7 +251,7 @@ module driveGear(mount) {
         gear_thickness = thickness,
         rim_thickness = thickness,
         hub_thickness = hub_thickness,
-        hub_diameter = 10,
+        hub_diameter = 12,
         bore_diameter = 0);
       lockW = compensatedHandWidth-1;
       translate([0,0,-1]) lockCylinder(compensatedHandWidth, lockW, lockW, hub_thickness+2);
@@ -264,7 +264,7 @@ module driveGear(mount) {
         gear_thickness = thickness,
         rim_thickness = thickness,
         hub_thickness = ht,
-        hub_diameter = 7,
+        hub_diameter = 9,
         bore_diameter = 0);
       translate([0,0,-1]) lockCylinder(5+expansion4, 5+expansion4, 3+expansion4, ht+2);
     }
