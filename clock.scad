@@ -34,8 +34,8 @@ $fa = 1;
 smallFn = 64;
 
 //Hands
-handWidth = 8;
-innerHandWidth = handWidth - 2 - expansion4;
+handRadius = 8;
+innerHandWidth = handRadius - 2 - expansion4;
 handLength = 38;
 handThickness = 2;
 innerHandZOffset = 3;
@@ -87,28 +87,28 @@ module outerClockHand() {
     //upper shaft
     difference() {
       difference() {
-        b = handWidth-1;
+        b = handRadius-1;
         h = blockSize*2-hub_thickness;
-        translate([0,0,blockSize]) ring(handWidth, handWidth-2, blockSize);
+        translate([0,0,blockSize]) ring(handRadius, handRadius-2, blockSize);
         translate([0,0,h]) hollowSquare(b,b,hub_thickness+1);
       }
       //lock cutout
-      translate([0.75,0,44.2]) hollowSquare(handWidth,handWidth-1,1);
+      translate([0.75,0,44.2]) hollowSquare(handRadius,handRadius-1,1);
     }
 
     //lower shaft
-    ring(handWidth, handWidth-2, blockSize);
+    ring(handRadius, handRadius-2, blockSize);
     difference() {
       clockHand();
-      translate([0,0,-1]) cylinder(d=handWidth-2, h=handThickness+2);
+      translate([0,0,-1]) cylinder(d=handRadius-2, h=handThickness+2);
     }
     
   }
 }
 module outerClockHandLockWasher() {
   difference() {
-    w = handWidth-1+expansion4;
-    c = handWidth-1.5+expansion4;
+    w = handRadius-1+expansion4;
+    c = handRadius-1.5+expansion4;
     hollowSquare(w,w,1,2);
     translate([-(c+0.25),-c/2,-1]) cube(c);
   }
@@ -125,14 +125,14 @@ module innerClockHand() {
     //lower shaft
     cylinder(h=blockSize+innerHandZOffset, d=innerHandWidth);
     //spacing ring
-    translate([0,0,2]) cylinder(h=innerHandZOffset-handThickness-0.3, d=handWidth);
+    translate([0,0,2]) cylinder(h=innerHandZOffset-handThickness-0.3, d=handRadius);
     clockHand();
   }
 }
 module clockHand() {
   union() {
-    translate([0,-handWidth/2,0]) cube([handLength,handWidth,handThickness]);
-    cylinder(h=handThickness, d=handWidth);
+    translate([0,-handRadius/2,0]) cube([handLength,handRadius,handThickness]);
+    cylinder(h=handThickness, d=handRadius);
   }
 }
 
@@ -158,10 +158,10 @@ module motorAssembly() {
           //middle crosshair beam
           translate([-outerRingD/2,-ringWidth/2,0]) cube([outerRingD,ringWidth,2]);
           //hand holder outter
-          cylinder(d=handWidth+2+expansion4, h=holderH);
+          cylinder(d=handRadius+2+expansion4, h=holderH);
         }
         //hand holder cutout
-        translate([0,0,-1]) cylinder(d=handWidth+expansion*4, h=holderH+2);
+        translate([0,0,-1]) cylinder(d=handRadius+expansion*4, h=holderH+2);
       }
       //end crosshair beams
       
@@ -244,7 +244,7 @@ module driveGear(mount) {
       translate([0,0,-1]) lockCylinder(compensatedHandWidth, lockW, lockW, hub_thickness+2);
     }
   } else if (mount == "outer") {
-    compensatedHandWidth = handWidth + expansion4;
+    compensatedHandWidth = handRadius + expansion4;
     difference() {
       gear (circular_pitch = circular_pitch,
         number_of_teeth = number_of_teeth,
