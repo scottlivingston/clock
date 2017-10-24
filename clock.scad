@@ -3,14 +3,14 @@ use <parametric_involute_gear_v5.0.scad>; //from https://www.thingiverse.com/thi
 
 // assembly will render the whole assembly positioned together. This makes it easy
 // to change things about the device and see the changes to the whole system
-assembly();
+// assembly();
 
 //each individual part can be rendered at the center of the screen using their 
 //individule modules
 //outerClockHand();
 //innerClockHand();
 //motorAssembly();
-//driveGear("motor"); //need 2 of these
+driveGear("motor"); //need 2 of these
 //driveGear("inner");
 //driveGear("outer");
 //outerClockHandLockWasher();
@@ -266,7 +266,7 @@ module driveGear(mount) {
         hub_thickness = ht,
         hub_diameter = 9,
         bore_diameter = 0);
-      translate([0,0,-1]) lockCylinder(5+expansion4, 5+expansion4, 3+expansion4, ht+2);
+      translate([0,0,-1]) lockCylinder(5+expansion2, 5+expansion2, 3+expansion2, ht+2);
     }
 
   }
