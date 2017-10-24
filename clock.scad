@@ -24,6 +24,10 @@ assembly();
 renderMotors = true;
 //all screw holes will fit this size.
 screwHoles = 3.08; //M3
+//to compensate for the expansion or contraction of the plastic
+expansion = 0.2; 
+expansion2 = expansion * 2;
+expansion4 = expansion * 4;
 //Generic default resolution for circles.
 $fa = 1;
 //Used for hole precision, needed to be high to allow for smooth spinning of the hands.
@@ -31,7 +35,7 @@ smallFn = 64;
 
 //Hands
 handWidth = 8;
-innerHandWidth = handWidth - 2.5;
+innerHandWidth = handWidth - 2 - expansion4;
 handLength = 38;
 handThickness = 2;
 innerHandZOffset = 3;
@@ -88,7 +92,8 @@ module outerClockHand() {
         translate([0,0,blockSize]) ring(handWidth, handWidth-2, blockSize);
         translate([0,0,h]) hollowSquare(b,b,hub_thickness+1);
       }
-      translate([0.75,0,44.2]) hollowSquare(handWidth,innerHandWidth+1,1);
+      //lock cutout
+      translate([0.75,0,44.2]) hollowSquare(handWidth,handWidth-1,1);
     }
 
     //lower shaft
@@ -102,8 +107,8 @@ module outerClockHand() {
 }
 module outerClockHandLockWasher() {
   difference() {
-    w = innerHandWidth+1;
-    c = innerHandWidth-0.5;
+    w = handWidth-1+expansion4;
+    c = handWidth-1.5+expansion4;
     hollowSquare(w,w,1,2);
     translate([-(c+0.25),-c/2,-1]) cube(c);
   }
@@ -150,10 +155,13 @@ module motorAssembly() {
         holderH = 14;
         $fn = smallFn;
         union() {
+          //middle crosshair beam
           translate([-outerRingD/2,-ringWidth/2,0]) cube([outerRingD,ringWidth,2]);
-          cylinder(d=handWidth+2.5, h=holderH);
+          //hand holder outter
+          cylinder(d=handWidth+2+expansion4, h=holderH);
         }
-        translate([0,0,-1]) cylinder(d=handWidth+0.5, h=holderH+2);
+        //hand holder cutout
+        translate([0,0,-1]) cylinder(d=handWidth+expansion*4, h=holderH+2);
       }
       //end crosshair beams
       
@@ -223,6 +231,7 @@ module driveGear(mount) {
   number_of_teeth = 24;
   thickness = 2;
   if (mount == "inner") {
+    compensatedHandWidth = innerHandWidth + expansion4;
     difference() {
       gear (circular_pitch = circular_pitch,
         number_of_teeth = number_of_teeth,
@@ -231,10 +240,11 @@ module driveGear(mount) {
         hub_thickness = hub_thickness,
         hub_diameter = 10,
         bore_diameter = 0);
-      lockW = innerHandWidth-1;
-      translate([0,0,-1]) lockCylinder(innerHandWidth, lockW, lockW, hub_thickness+2);
+      lockW = compensatedHandWidth-1;
+      translate([0,0,-1]) lockCylinder(compensatedHandWidth, lockW, lockW, hub_thickness+2);
     }
   } else if (mount == "outer") {
+    compensatedHandWidth = handWidth + expansion4;
     difference() {
       gear (circular_pitch = circular_pitch,
         number_of_teeth = number_of_teeth,
@@ -243,8 +253,8 @@ module driveGear(mount) {
         hub_thickness = hub_thickness,
         hub_diameter = 10,
         bore_diameter = 0);
-      lockW = handWidth-1;
-      translate([0,0,-1]) lockCylinder(handWidth, lockW, lockW, hub_thickness+2);
+      lockW = compensatedHandWidth-1;
+      translate([0,0,-1]) lockCylinder(compensatedHandWidth, lockW, lockW, hub_thickness+2);
     }
   } else if (mount == "motor"){
     difference() {
@@ -256,7 +266,7 @@ module driveGear(mount) {
         hub_thickness = ht,
         hub_diameter = 7,
         bore_diameter = 0);
-      translate([0,0,-1]) lockCylinder(5, 5, 3, ht+2);
+      translate([0,0,-1]) lockCylinder(5+expansion4, 5+expansion4, 3+expansion4, ht+2);
     }
 
   }
