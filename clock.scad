@@ -3,17 +3,17 @@ use <parametric_involute_gear_v5.0.scad>; //from https://www.thingiverse.com/thi
 
 // assembly will render the whole assembly positioned together. This makes it easy
 // to change things about the device and see the changes to the whole system
-// assembly();
+assembly();
 
 //each individual part can be rendered at the center of the screen using their 
-//individule modules
-//outerClockHand();
-//innerClockHand();
-//motorAssembly();
-driveGear("motor"); //need 2 of these
-//driveGear("inner");
-//driveGear("outer");
-//outerClockHandLockWasher();
+//individual modules
+// outerClockHand();
+// innerClockHand();
+// motorAssembly();
+// driveGear("motor"); //need 2 of these
+// driveGear("inner");
+// driveGear("outer");
+// outerClockHandLockWasher();
 
 //debugging
 //hollowSquare(8,8,5);
@@ -25,7 +25,7 @@ renderMotors = true;
 //all screw holes will fit this size.
 screwHoles = 3.08; //M3
 //to compensate for the expansion or contraction of the plastic
-expansion = 0.2; 
+expansion = 0.25;
 expansion2 = expansion * 2;
 expansion4 = expansion * 4;
 //Generic default resolution for circles.
@@ -93,7 +93,7 @@ module outerClockHand() {
         translate([0,0,h]) hollowSquare(b,b,hub_thickness+1);
       }
       //lock cutout
-      translate([0.75,0,44.2]) hollowSquare(handRadius,handRadius-1,1);
+      translate([0,0,44.2]) ring(handRadius+1,handRadius-1,1);
     }
 
     //lower shaft
@@ -108,8 +108,8 @@ module outerClockHand() {
 module outerClockHandLockWasher() {
   difference() {
     w = handRadius-1+expansion4;
-    c = handRadius-1.5+expansion4;
-    hollowSquare(w,w,1,2);
+    c = handRadius-2;
+    ring(w+2,w,1);
     translate([-(c+0.25),-c/2,-1]) cube(c);
   }
 }
@@ -227,7 +227,7 @@ module lockCylinder(d, x, y, h) {
   }
 }
 module driveGear(mount) {
-  circular_pitch=195;
+  circular_pitch=190;
   number_of_teeth = 24;
   thickness = 2;
   if (mount == "inner") {
